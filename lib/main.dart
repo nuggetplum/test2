@@ -67,14 +67,31 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+@override
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<dynamic> games = [];
   // late Future<Album> futureAlbum;
+  Future<void> fetchLiveScores() async {
+    final response =
+        await http.get(Uri.parse('https://www.balldontlie.io/api/v1/games'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        games = data['data'];
+      });
+    } else {
+      throw Exception('Failed to load live scores');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    fetchLiveScores();
+
     _tabController = TabController(length: 5, vsync: this);
     //futureAlbum = fetchAlbum();
   }
